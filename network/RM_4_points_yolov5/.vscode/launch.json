@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--source", "/home/pheonix/NewDisk/RM_stuff/RM数据集/11.mp4", "--weights", "/home/pheonix/NewDisk/about_radar/Radar_structure/Our_project/weights/detail_best.pt"
+                      ]
+        },
+        {
+            "name": "Python: Export",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--weights", "/home/pheonix/NewDisk/about_radar/Radar_structure/Our_project/weights/detail_best.pt", 
+                     "--img_size", "640", "640"]
+        }
+
+    ]
+}

@@ -1,0 +1,5 @@
+Log file created at: 2023/06/02 18:35:36
+Running on machine: pheonix
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W0602 18:35:36.921497  8055 MVCameraBase.cpp:99] Device:(name:MV-SUA630C#0 sn:043011420167)Lost
+W0602 18:36:24.214381  8055 MVCameraBase.cpp:119] Device:(name:MV-SUA630C#0 sn:043011420167)ReConnected, TolCount:1
