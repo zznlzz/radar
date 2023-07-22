@@ -148,8 +148,8 @@ if __name__ == "__main__":
     sys.path.append('../single_version')
     from camera import Camera_Thread
     from macro import img_sz, map_size, MAP_PATH
-    app = Dashboard(img_sz, map_size)
     cap = Camera_Thread(0)
+    app = Dashboard(img_sz, map_size)
     map = cv2.imread(MAP_PATH)
     while 1:
         cv2.imshow('test', np.zeros((2,2)))

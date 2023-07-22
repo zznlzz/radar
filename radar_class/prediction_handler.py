@@ -65,6 +65,10 @@ class Bbox_Handler:
         pass
     
     def push_T_and_inver(self, rvec, tvec):
+        '''      
+        接收旋转向量（rvec）和平移向量（tvec），将它们保存到类的成员变量中，并生成一个4x4的变换矩阵T
+        该方法还返回T与原点(0,0,0,1)相乘后的结果的前三个元素，即变换后的原点坐标
+        '''
         self._rvec = rvec
         self._tvec = tvec
         # 基于位姿做反投影，初始化scene_region预警区域字典

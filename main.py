@@ -39,6 +39,7 @@ class radar_process:
         self.vi_saver = cv2.VideoWriter(f'{VIDEO_SAVE_DIR}/{save_order}.mp4', fourcc, 6, imgsz)
         self.resume_flag = 0
 
+        # 初始化处理边界框和地图的类
         self.bbox_handler = Bbox_Handler()
         self._scene = [self.bbox_handler]
         self.location_alarmor = Location_alarmer(False, True)
