@@ -31,8 +31,13 @@ def __callback_1(event,x,y,flags,param):
         corner = cv2.cornerSubPix(param["pick_img_raw"],np.float32([x,y]).reshape(1,1,2),(5,5),(-1,-1),stop_criteria).reshape(2)
         param["pick_point"] = [corner[0],corner[1]]
         cv2.circle(param["pick_img"],(x,y),2,(0,255,0),1)
-        
+
 def three_locate_pick(cap:Camera_Thread,enemy,camera_type,home_size = False,video_test = False, panel=None):
+    '''
+    手动四点标定，计算相机的旋转向量和平移向量
+    enemy: 敌方目标的标识，0表示敌方为红色，1表示敌方为蓝色。
+    camera_type: 相机的标识，0表示右侧相机，1表示左侧相机。
+    '''
     if home_size:
         location_type = 'home_test'
         red_base = location_targets[location_type]['red_base']
@@ -55,6 +60,8 @@ def three_locate_pick(cap:Camera_Thread,enemy,camera_type,home_size = False,vide
         b_lt = location_targets[location_type]['b_lt']
 
     K_0, C_0= read_yaml(camera_type)[1:3]
+
+    # 根据enemy和camera_type确定使用哪组提示信息
     tips = \
     {
         '00':['red_base','b_right_top','b_left_top'],
@@ -92,6 +99,7 @@ def three_locate_pick(cap:Camera_Thread,enemy,camera_type,home_size = False,vide
     info["pick_flag"] = False
     info["pick_point"] = None # 回调函数中点击的点
 
+    # 创建两个窗口，一个显示视频流，一个显示鼠标点击的放大图
     cv2.namedWindow(info["pick_winname"], cv2.WINDOW_NORMAL)
     cv2.resizeWindow(info["pick_winname"], 1280,780)
     cv2.setWindowProperty(info["pick_winname"],cv2.WND_PROP_TOPMOST,1)
@@ -101,39 +109,43 @@ def three_locate_pick(cap:Camera_Thread,enemy,camera_type,home_size = False,vide
     cv2.setWindowProperty(info["zoom_winname"],cv2.WND_PROP_TOPMOST,1)
     cv2.setMouseCallback("pick_corner", __callback_1, info)
 
+    # 手动四点标定
     pick_point = []
     while True:
-        # draw tips
+        # 绘制提示信息
         cv2.putText(frame,tips[str(enemy)+str(camera_type)][len(pick_point)],(tip_w,tip_h),
                     cv2.FONT_HERSHEY_SIMPLEX,3,(0,255,0),2)
 
-        # draw the points having been picked
+        # 绘制已经选择的点
         for select_p in pick_point:
             cv2.circle(frame, (int(select_p[0]), int(select_p[1])), 1, (0, 255, 0), 2)
 
-        # draw the connecting line following the picking order
+        # 绘制连接线
         for p_index in range(1, len(pick_point)):
             cv2.line(frame, (int(pick_point[p_index - 1][0]), int(pick_point[p_index - 1][1])),
                      (int(pick_point[p_index][0]), int(pick_point[p_index][1])), (0, 255, 0), 2)
 
         cv2.imshow(info["pick_winname"], info["pick_img"])
 
-        if info["pick_flag"]: # 当在回调函数中触发点击事件
+        # 当在回调函数中触发点击事件
+        if info["pick_flag"]: 
             pick_point.append(info["pick_point"])
-            # draw the points having been picked
+            #绘制已选择的点（绿色）
             for select_p in pick_point:
                 cv2.circle(frame, (int(select_p[0]), int(select_p[1])), 1, (0, 255, 0), 2)
 
-            # draw the connecting line following the picking order
+            # 绘制连接线（绿色）
             for p_index in range(1, len(pick_point)):
                 cv2.line(frame, (int(pick_point[p_index - 1][0]), int(pick_point[p_index - 1][1])),
                          (int(pick_point[p_index][0]), int(pick_point[p_index][1])), (0, 255, 0), 2)
+            
             # 四点完成，首尾相连
             if len(pick_point) == 3:
                 cv2.line(frame, (int(pick_point[2][0]), int(pick_point[2][1])),
                          (int(pick_point[0][0]), int(pick_point[0][1])), (0, 255, 0), 2)
 
             cv2.imshow(info["pick_winname"], info["pick_img"])
+            
             # 将刚加入的pop出等待确认后再加入
             pick_point.pop()
             key = cv2.waitKey(0)

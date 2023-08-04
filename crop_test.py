@@ -62,9 +62,11 @@ def down_move(mv_sz):
 
 
 while 1:
+    from radar_class import mvsdk
     ret, frame = cap.read()
     new_frame = frame[y1:y2, x1:x2]
     # new_frame = cv2.resize(new_frame, model_imgsz)
+    mvsdk.CameraReadParameterFromFile(cap.cap.hCamera, 'save_stuff/camera_0_of_2023-07-19 15-12-54.Config')
     _, _, show_im = net.cated_infer(new_frame)
     cv2.imshow('shrink_frame', show_im)
     key = cv2.waitKey(1)

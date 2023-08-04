@@ -1,4 +1,4 @@
-from RM_4_points_yolov5 import detect
+from network.RM_4_points_yolov5 import detect
 import torch
 import numpy as np
 import cv2

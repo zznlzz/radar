@@ -22,13 +22,13 @@
 
 import cv2
 import sys
-sys.path.append('RM_4_points_yolov5/')
+sys.path.append('network/RM_4_points_yolov5/')
 sys.path.append('radar_class/')
 from radar_class.camera import Camera_Thread
 from network.Predictor import Predictor
 model_imgsz = (800, 800)
 # 打开视频文件
-cap = cv2.VideoCapture('/home/pheonix/NewDisk/about_radar/Radar_structure/single_version/save_stuff/video/15.mp4')
+cap = cv2.VideoCapture('save_stuff/video/15.mp4')
 NET_PATH = 'weights/800x800_large.pt'
 net = Predictor(NET_PATH, model_imgsz)
 cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
