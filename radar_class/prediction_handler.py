@@ -19,6 +19,8 @@ def plot(results, frame, only_car=True):
             continue
         if '0' in cat:
             # 通过颜色检测出的bounding box
+            # color2enemy[cat.split('_')[1]]用于从类别中提取敌人的颜色。
+            # *bound是将边界框坐标拆分为四个值（x0、y0、x1、y1），然后创建一个包含颜色和边界框坐标的数组，并将其添加到color_bbox列表中。
             color_bbox.append(np.array([color2enemy[cat.split('_')[1]], *bound]))
         plot_one_box(cat, bound, frame)
     if len(color_bbox):
@@ -27,7 +29,7 @@ def plot(results, frame, only_car=True):
         return None
     
 def plot_one_box(cat, b, img):
-    if cat.split('_')[0] == "car":
+    if cat.split('_')[0] == "car":# 模型预测对象是车
         if len(cat.split('_')) == 3:  # car_{armor_color}_{armor_id}
             cat = cat.split('_')
             color = cat[1]
@@ -65,7 +67,7 @@ class Bbox_Handler:
         pass
     
     def push_T_and_inver(self, rvec, tvec):
-        '''      
+        '''
         接收旋转向量（rvec）和平移向量（tvec），将它们保存到类的成员变量中，并生成一个4x4的变换矩阵T
         该方法还返回T与原点(0,0,0,1)相乘后的结果的前三个元素，即变换后的原点坐标
         '''
@@ -74,9 +76,9 @@ class Bbox_Handler:
         # 基于位姿做反投影，初始化scene_region预警区域字典
         T = np.eye(4)
         # 这里将旋转向量转换成为旋转矩阵
-        T[:3, :3] = cv2.Rodrigues(rvec)[0]
-        T[:3, 3] = tvec.reshape(-1)
-        T = np.linalg.inv(T)
+        T[:3, :3] = cv2.Rodrigues(rvec)[0]# 将旋转向量rvec转换为旋转矩阵，并将其赋值给变换矩阵T的前3x3部分
+        T[:3, 3] = tvec.reshape(-1)# 将平移向量tvec进行重新形状处理，然后将其赋值给变换矩阵T的前3行的第4列
+        T = np.linalg.inv(T)# 取逆
 
         return T, (T @ (np.array([0, 0, 0, 1])))[:3]
 

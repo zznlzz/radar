@@ -129,6 +129,9 @@ class radar_process:
                 self.panel.update_text("[INFO] Camera 0 pose init error", is_warning=True)
 
     def increment_path(self, up_dir): 
+        '''
+        增加视频保存路径中的数字序号，以确保不会覆盖已有的视频文件
+        '''
         if up_dir[-1] != '/':
             up_dir = up_dir+'/'
         file_name_list = glob.glob(f'{up_dir}*.mp4')
@@ -140,7 +143,7 @@ class radar_process:
                     start_num = current_num
         else:
             return start_num
-        return start_num+1    
+        return start_num+1
 
     def update_postion(self):
         flag = False
@@ -155,13 +158,18 @@ class radar_process:
             print("[WARNING] Camera 0 pose updated error")
 
     def change_id_2_uart(self, pred_loc):
+        '''
+        将目标的ID更改为对应的UART ID
+        '''
         # 这里必须要确保pred_loc不是None或者之类的异常变量
         for row in pred_loc:
             row[0] = self.uart_ids[row[0]] if row[0] in self.uart_ids.keys() else row[0]
 
     def spin_once(self):
+        # 检查雷达初始化状态
         if self.radar.check_radar_init():
             self.radar_init = True
+
         # 2.6226043701171875e-05
         # 对打开失败的相机，尝试再次打开
         if not self.cap.is_open():
@@ -173,26 +181,31 @@ class radar_process:
             time.sleep(0.05)
             return
         
+        # 目标检测和筛选
         ret, locations, show_im = self.net.cated_infer(frame)
         locations = armor_filter(locations)
+
+        # 更新前段面板显示的摄像头图片
         self.panel.update_cam_pic(show_im)
         
         pred_loc = None
         
         if ret:
-            
+            # 位置信息的微调
             pred_loc = self.location_alarmor.refine_cood(locations, self.radar)
             
             if len(pred_loc): 
                 pred_loc = np.array(pred_loc, dtype=np.float32)
                 if len(pred_loc.shape) == 1: pred_loc = pred_loc[None]
             
+            # 如果微调后的目标位置信息可用（有一个包含目标信息的数组）
             if isinstance(pred_loc, np.ndarray):
                 self.debugger.pred_loc_debugger(pred_loc)
                 self.change_id_2_uart(pred_loc)
                 Static_UART.push_loc(pred_loc)
                 Static_UART.push_alarm(pred_loc)
-              
+
+        # 调试模式下的地图显示
         if debug:
             self.panel.update_map_mood(self.bbox_handler.draw_on_map(pred_loc, self.map.copy()))
         
